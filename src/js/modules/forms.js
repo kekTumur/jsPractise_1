@@ -2,7 +2,8 @@ import checkNumInputs from './checkNumInputs';
 
 const forms = (state) => {
     const form = document.querySelectorAll('form'),
-          inputs = document.querySelectorAll('input');
+          inputs = document.querySelectorAll('input'),
+          modal = document.querySelector('.popup_calc_end');
 
     checkNumInputs('input[name="user_phone"]');
     
@@ -34,7 +35,10 @@ const forms = (state) => {
 
             const formData = new FormData(item);
             if (item.getAttribute('data-calc') === 'end'){
-                for (let key in state) formData.append(key, state[key]);
+                for (let key in state) {
+                    formData.append(key, state[key]);
+                    delete state[key];
+                };
             }
             postData('assets/server.php', formData)
             .then(res => {
@@ -44,7 +48,13 @@ const forms = (state) => {
             .catch(() => statusMessage.textContent = message.failure)
             .finally(() => {
                 clearInputs();
-                setTimeout(() => statusMessage.remove(), 5000);
+                setTimeout(() => {
+                    statusMessage.remove();
+                    if (item.getAttribute('data-calc') === "end"){
+                        modal.style.display = 'none';
+                        document.body.style.overflow = "";
+                    }
+                }, 1000);
             });
         });
     });
